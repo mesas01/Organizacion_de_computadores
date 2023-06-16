@@ -1,0 +1,56 @@
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;                             
+--------------------------------------------------------
+ENTITY shift_unit_tb IS
+END shift_unit_tb;
+--------------------------------------------------------
+ARCHITECTURE funtional_tb OF shift_unit_tb IS
+                                                   
+
+SIGNAL shamt_tb   :   STD_LOGIC_VECTOR (1 DOWNTO 0); 
+SIGNAL dataa_tb   :   STD_LOGIC_VECTOR (7 DOWNTO 0);
+SIGNAL dataout_tb :   STD_LOGIC_VECTOR (7 DOWNTO 0);
+
+--------------------------------------------------------
+BEGIN
+	
+	DUT: ENTITY work.shift_unit
+	PORT MAP ( 
+				  shamt         => shamt_tb,
+				  dataa         => dataa_tb,
+				  dataout       => dataout_tb);
+	
+	--SIGNAL GENERATION:-------------
+	signal_generation_1: PROCESS
+	BEGIN
+   -- TEST VECTOR 1
+	shamt_tb <= "00";
+   WAIT FOR 150ns;
+	shamt_tb <= "01";
+   WAIT FOR 150ns;
+	shamt_tb <= "10";
+   WAIT FOR 150ns;
+	shamt_tb <= "11";
+   WAIT FOR 150ns;	
+	END PROCESS signal_generation_1;
+--------------------------------------------------------
+   signal_generation_2: PROCESS
+	BEGIN
+	dataa_tb <= "00000000";
+   WAIT FOR 50ns;
+	dataa_tb <= "00000001";
+	WAIT FOR 50ns;
+	dataa_tb <= "00000010";
+   WAIT FOR 50ns;
+	dataa_tb <= "00000011";
+	WAIT FOR 50ns;
+	dataa_tb <= "00000100";
+	WAIT FOR 50ns;
+	dataa_tb <= "00000101";
+	WAIT FOR 50ns;
+	dataa_tb <= "00000110";
+	WAIT FOR 50ns;
+	END PROCESS signal_generation_2;         
+
+--------------------------------------------------------                               
+END ARCHITECTURE funtional_tb;

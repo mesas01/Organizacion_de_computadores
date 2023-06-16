@@ -1,0 +1,72 @@
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;                             
+--------------------------------------------------------
+ENTITY processing_unit_tb IS
+END processing_unit_tb;
+--------------------------------------------------------
+ARCHITECTURE Testbench_processing_unit OF processing_unit_tb IS
+--------------------------------------------------------
+
+SIGNAL	dataa_tb  :  STD_LOGIC_VECTOR (7 DOWNTO  0);
+SIGNAL	datab_tb  :  STD_LOGIC_VECTOR (7 DOWNTO  0);
+SIGNAL	selop_tb  :  STD_LOGIC_VECTOR (2 DOWNTO  0);
+SIGNAL	result_tb :  STD_LOGIC_VECTOR (7 DOWNTO  0);
+SIGNAL	cout_tb   :  STD_LOGIC;
+--------------------------------------------------------
+BEGIN
+
+	DUT_1: ENTITY work.processing_unit
+	PORT MAP ( dataa  =>  dataa_tb,
+				  datab  =>  datab_tb,
+				  selop  =>  selop_tb,
+				  result =>  result_tb,
+				  cout   =>  cout_tb);
+				  
+----------------SIGNAL GENERATION:----------------------
+signal_generation_1: PROCESS
+	BEGIN
+   -- TEST VECTOR 1
+	dataa_tb<="00000000";
+   WAIT FOR 100ns;
+	dataa_tb<="00000001";
+   WAIT FOR 100ns;	
+	dataa_tb<="10000011";
+   WAIT FOR 100ns;
+
+	END PROCESS signal_generation_1;
+----------------SIGNAL GENERATION:----------------------
+signal_generation_2: PROCESS
+	BEGIN
+   -- TEST VECTOR 2
+	datab_tb<="00001000";
+   WAIT FOR 100ns;
+	datab_tb<="00000011";
+   WAIT FOR 100ns;	
+	datab_tb<="00000011";
+   WAIT FOR 100ns;
+
+	END PROCESS signal_generation_2;
+
+----------------SIGNAL GENERATION:----------------------
+signal_generation_3: PROCESS
+	BEGIN
+   -- TEST VECTOR 3
+	selop_tb<="000";
+   WAIT FOR 100ns;
+	selop_tb<="001";
+   WAIT FOR 100ns;	
+	selop_tb<="010";
+   WAIT FOR 100ns;
+	selop_tb<="011";
+   WAIT FOR 100ns;
+	selop_tb<="110";
+   WAIT FOR 100ns;
+	selop_tb<="100";
+   WAIT FOR 100ns;
+	selop_tb<="111";
+   WAIT FOR 100ns;
+	END PROCESS signal_generation_3;
+
+--------------------------------------------------------	
+
+END ARCHITECTURE Testbench_processing_unit;

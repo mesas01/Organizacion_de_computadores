@@ -1,0 +1,21 @@
+-----------------------------------------------------------------------------------------------
+--Libraries--
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+-----------------------------------------------------------------------------------------------
+ENTITY shift_unit IS
+	GENERIC (N: INTEGER :=8); -- Tamaño de los vectores
+	PORT ( 	 shamt   :  IN STD_LOGIC_VECTOR (  1 DOWNTO 0); -- Seletor de operación
+			 dataa   :  IN STD_LOGIC_VECTOR (N-1 DOWNTO 0); -- Dato de entrada
+			 dataout : OUT STD_LOGIC_VECTOR (N-1 DOWNTO 0)); -- Dato de salida
+END ENTITY;
+-----------------------------------------------------------------------------------------------
+ARCHITECTURE rtl OF shift_unit IS
+BEGIN
+	 
+	WITH shamt SELECT 
+		dataout <= dataa                  	    WHEN "00", -- Dato de salida = Dato de entrada 
+				'0' & dataa (N-1 DOWNTO 1)  WHEN "01", -- Despalzamiento a la derecha de 1 bit
+				dataa(N-2 DOWNTO 0) & '0'   WHEN "10", -- Despalzamiento a la izquierda de 1 bit
+				(OTHERS => '0')             WHEN OTHERS; -- Dato de salida = 0
+END ARCHITECTURE;

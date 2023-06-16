@@ -1,0 +1,41 @@
+-------------------------------------------------------------------------------------------------------------------------
+-- Libraries --
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+-------------------------------------------------------------------------------------------------------------------------
+ENTITY flag_register IS
+	GENERIC (	M		:	INTEGER:=8); -- Tamaño de los vectores
+	PORT (	clk		:	IN  STD_LOGIC; -- Reloj del sistema
+				rst		:	IN  STD_LOGIC; -- Señal de reset
+				enaf		:	IN  STD_LOGIC; -- Señal de enable 
+				dataa		:  IN  STD_LOGIC_VECTOR(M-1 DOWNTO 0); -- Dato de entrada
+				carry		:	IN  STD_LOGIC; -- Carry de entrada
+				C,N,Z,P	:	OUT STD_LOGIC); -- Banderas de salida
+END ENTITY flag_register;
+-------------------------------------------------------------------------------------------------------------------------
+ARCHITECTURE rtl OF flag_register IS
+	CONSTANT ZEROS		:	 STD_LOGIC_VECTOR(M-1 DOWNTO 0) := (OTHERS => '0'); -- Vector de ceros
+	SIGNAL RES : STD_LOGIC_VECTOR(M-1 DOWNTO 0); -- Señal de interconexión
+BEGIN 
+	RES <= dataa; -- Asignación de la señal de entrada a la de interconexión
+   PROCESS(clk, rst) -- Lista de sensitividad
+	BEGIN 
+		IF (rst='1') THEN -- Si el reset esta en 1, el sistema no actua
+			C <= '0'; -- No hay bandera
+			N <= '0'; -- No hay bandera
+			Z <= '0'; -- No hay bandera
+			P <= '0'; -- No hay bandera
+			ELSIF (rising_edge(clk)) THEN -- Evalua si hay pulso de subida en el reloj
+				IF (enaf = '1') THEN -- Actua si el enable esta en 1
+					N <= dataa(7); -- Pone el valor del el bit más significativo del dato de entrada
+					C <= carry; -- Si hay uno en el carry de entrada se activa la bandera
+					P <= not(RES(7) XOR RES(6) XOR RES(5) XOR RES(4) XOR RES(3) XOR RES(2) XOR RES(1) XOR RES(0));-- Paridad 
+					IF dataa = ZEROS THEN -- Bandera de cero
+						Z <= '1'; -- Si es cero la bandera se activa
+						ELSE 
+							Z <= '0'; -- Si no es cero el dato no se activa
+					END IF;
+				END IF;
+		END IF;
+	END PROCESS;
+ END ARCHITECTURE rtl;

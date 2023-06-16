@@ -1,0 +1,130 @@
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;                             
+--------------------------------------------------------
+ENTITY alu_tb IS
+END alu_tb;
+ARCHITECTURE Testbench_ALU OF alu_tb IS
+ Signal bus_a_tb  : STD_LOGIC_VECTOR (7 DOWNTO 0);
+ Signal bus_b_tb  : STD_LOGIC_VECTOR (7 DOWNTO 0);
+ Signal selop_tb  : STD_LOGIC_VECTOR ( 2  DOWNTO 0);
+ Signal clk_tb		: STD_LOGIC:='0';
+ Signal rst_tb		: STD_LOGIC;
+ Signal enaf_tb   : STD_LOGIC;
+ Signal shamt_tb  : STD_LOGIC_VECTOR (  1 DOWNTO 0); 
+ Signal bus_c_tb  : STD_LOGIC_VECTOR (7 DOWNTO 0);
+ SIGNAL C_tb		: STD_LOGIC;
+ SIGNAL N_tb		: STD_LOGIC;
+ SIGNAL Z_tb		: STD_LOGIC;
+ SIGNAL P_tb 		: STD_LOGIC;
+
+ BEGIN
+--CLOCK GENERATION:--------------
+	clk_tb <= not clk_tb after 10ns;  --50MHz clock generation
+--RESET GENERATION:--------------
+DUT: ENTITY work.alu
+	PORT MAP ( clk 	   => clk_tb,
+				  rst	   	=> rst_tb,
+				  enaf      => enaf_tb,			  
+				  C		   => C_tb,
+				  N   	   => N_tb,
+				  Z      	=> Z_tb,
+				  P		   => P_tb,
+				  bus_a     => bus_a_tb,
+				  bus_b     => bus_b_tb,
+				  selop     => selop_tb,
+				  shamt     => shamt_tb,
+				  bus_c     => bus_c_tb
+				  );
+--------------SIGNAL GENERATION:----------------------	
+	signal_generation_1: PROCESS
+	BEGIN
+	rst_tb<='0';
+   WAIT FOR 50ns;
+	rst_tb<='0';
+   WAIT FOR 1000ns;	
+	END PROCESS signal_generation_1;
+--------------SIGNAL GENERATION:----------------------
+------------------------------------------------------   
+	signal_generation_2: PROCESS
+	BEGIN
+	enaf_tb<='0';
+   WAIT FOR 400ns;
+	enaf_tb<='1';
+	WAIT FOR 4000ns;
+	END PROCESS signal_generation_2;
+------------------------------------------------------	
+--------------SIGNAL GENERATION:----------------------
+	signal_generation_3: PROCESS
+	BEGIN
+   -- TEST VECTOR 1
+	shamt_tb<="00";
+   WAIT FOR 150ns;
+	shamt_tb<="01";
+   WAIT FOR 150ns;
+	shamt_tb<="10";
+   WAIT FOR 150ns;
+	shamt_tb<="11";
+   WAIT FOR 150ns;	
+	END PROCESS signal_generation_3;
+------------------------------------------------------
+----------------SIGNAL GENERATION:----------------------
+	signal_generation_4: PROCESS
+	BEGIN
+   -- TEST VECTOR 3
+	selop_tb<="000";
+   WAIT FOR 100ns;
+	selop_tb<="001";
+   WAIT FOR 100ns;	
+	selop_tb<="010";
+   WAIT FOR 100ns;
+	selop_tb<="011";
+   WAIT FOR 100ns;
+	selop_tb<="110";
+   WAIT FOR 100ns;
+	selop_tb<="100";
+   WAIT FOR 100ns;
+	selop_tb<="111";
+   WAIT FOR 100ns;
+	END PROCESS signal_generation_4;
+--------------------------------------------------------	
+----------------SIGNAL GENERATION:----------------------
+signal_generation_5: PROCESS
+	BEGIN
+   -- TEST VECTOR 1
+	bus_a_tb<="00000000";
+   WAIT FOR 100ns;
+	bus_a_tb<="00000001";
+   WAIT FOR 100ns;	
+	bus_a_tb<="10000011";
+   WAIT FOR 100ns;
+	bus_a_tb<="11000000";
+   WAIT FOR 100ns;
+	bus_a_tb<="00110010";
+   WAIT FOR 100ns;
+	bus_a_tb<="11111111";
+   WAIT FOR 100ns;
+	bus_a_tb<="11100010";
+   WAIT FOR 100ns;
+	END PROCESS signal_generation_5;
+--------------------------------------------------------	
+----------------SIGNAL GENERATION:----------------------
+signal_generation_6: PROCESS
+	BEGIN
+   -- TEST VECTOR 2
+	bus_b_tb<="00001000";
+   WAIT FOR 100ns;
+	bus_b_tb<="10000011";
+   WAIT FOR 100ns;	
+	bus_b_tb<="11111111";
+   WAIT FOR 100ns;
+	bus_b_tb<="01010101";
+   WAIT FOR 100ns;
+	bus_b_tb<="10101010";
+   WAIT FOR 100ns;
+	bus_b_tb<="00001111";
+   WAIT FOR 100ns;
+	bus_b_tb<="11110000";
+   WAIT FOR 100ns;
+	END PROCESS signal_generation_6;
+--------------------------------------------------------	
+END ARCHITECTURE Testbench_ALU;

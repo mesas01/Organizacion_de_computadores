@@ -1,0 +1,78 @@
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;                             
+--------------------------------------------------------
+ENTITY flag_register_tb IS
+END flag_register_tb;
+--------------------------------------------------------
+ARCHITECTURE RFuntional_tb OF flag_register_tb IS
+                                                   
+SIGNAL clk_tb 						: STD_LOGIC := '0';
+SIGNAL rst_tb	 					: STD_LOGIC;
+SIGNAL enaf_tb 					: STD_LOGIC;
+SIGNAL carry_tb 					: STD_LOGIC;
+SIGNAL dataa_tb 					: STD_LOGIC_VECTOR(7 DOWNTO 0);
+SIGNAL C_tb						 	: STD_LOGIC;
+SIGNAL N_tb				 			: STD_LOGIC;
+SIGNAL Z_tb		 					: STD_LOGIC;
+SIGNAL P_tb 						: STD_LOGIC;
+
+--------------------------------------------------------
+BEGIN
+--CLOCK GENERATION:--------------
+	clk_tb <= not clk_tb after 10ns;  --50MHz clock generation
+--RESET GENERATION:--------------
+	
+	DUT: ENTITY work.flag_register
+	PORT MAP ( clk 	  		 => clk_tb,
+				  rst	   		 => rst_tb,
+				  enaf     		 => enaf_tb,
+				  carry   		 => carry_tb,
+				  dataa         => dataa_tb,
+				  C				 => C_tb,
+				  N   		    => N_tb,
+				  Z      		 => Z_tb,
+				  P		       => P_tb);
+	
+	--SIGNAL GENERATION:-------------
+	signal_generation_1: PROCESS
+	BEGIN
+   -- TEST VECTOR 1
+	rst_tb <= '0';
+   WAIT FOR 50ns;
+	rst_tb <= '0';
+   WAIT FOR 1000ns;	
+	END PROCESS signal_generation_1;
+--------------------------------------------------------
+   signal_generation_2: PROCESS
+	BEGIN
+	enaf_tb <= '1';
+   WAIT FOR 600ns;
+	enaf_tb <= '0';
+	WAIT FOR 400ns;
+	END PROCESS signal_generation_2;
+--------------------------------------------------------	
+   signal_generation_3: PROCESS
+	BEGIN
+	carry_tb <= '1';
+	WAIT FOR 90ns;
+	carry_tb <= '0';
+	WAIT FOR 100ns;
+	END PROCESS signal_generation_3;
+--------------------------------------------------------	 
+   signal_generation_4: PROCESS
+	BEGIN
+	dataa_tb <= "00000001";
+	WAIT FOR 100ns;
+	dataa_tb <= "00000010";
+	WAIT FOR 100ns;
+	dataa_tb <= "00000111";
+	WAIT FOR 100ns;
+	dataa_tb <= "00000101";
+	WAIT FOR 100ns;
+	dataa_tb <= "10000010";
+	WAIT FOR 100ns;
+	dataa_tb <= "00000000";
+	WAIT FOR 100ns;
+	END PROCESS signal_generation_4;
+--------------------------------------------------------                               
+END ARCHITECTURE RFuntional_tb;

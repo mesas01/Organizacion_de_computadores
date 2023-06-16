@@ -1,0 +1,86 @@
+LIBRARY IEEE;
+USE IEEE.STD_LOGIC_1164.ALL;
+USE IEEE.NUMERIC_STD.ALL;
+-------------------------------------------------------------------------------------------------------------------
+ENTITY processing_unit IS 
+
+	GENERIC (N     : INTEGER :=8);--Numero de bits
+	PORT (  dataa  : IN  STD_LOGIC_VECTOR (N-1 DOWNTO 0);--Bus de datos A de la unidad de procesamiento 
+			  datab  : IN  STD_LOGIC_VECTOR (N-1 DOWNTO 0);--Bus de datos B de la unidad de procesamiento 
+			  selop  : IN  STD_LOGIC_VECTOR ( 2  DOWNTO 0);--Datos para la seleccion de operacion
+			  result : OUT STD_LOGIC_VECTOR (N-1 DOWNTO 0);--Resultado de las operaciones
+			  cout   : OUT STD_LOGIC);--carry de las operaciones
+END ENTITY processing_unit;
+-------------------------------------------------------------------------------------------------------------------
+ARCHITECTURE rtl OF processing_unit IS
+
+	CONSTANT ONE    :  STD_LOGIC_VECTOR (N-1 DOWNTO 0) := STD_LOGIC_VECTOR(to_unsigned(1,N));--vector de unos
+	CONSTANT ZEROS  :  STD_LOGIC_VECTOR (N-1 DOWNTO 0) := (OTHERS => '0');--vector de ceros
+	----------------------------------Señales de interconexión------------------------------------------------------
+	SIGNAL  not_b                        : STD_LOGIC_VECTOR  (N-1 DOWNTO 0);
+	SIGNAL  a_and_b                      : STD_LOGIC_VECTOR  (N-1 DOWNTO 0);
+	SIGNAL  a_or_b                       : STD_LOGIC_VECTOR  (N-1 DOWNTO 0);
+	SIGNAL  a_xor_b                      : STD_LOGIC_VECTOR  (N-1 DOWNTO 0);
+	SIGNAL  a_plus_b                     : STD_LOGIC_VECTOR  (N-1 DOWNTO 0);
+	SIGNAL  b_plus_one                   : STD_LOGIC_VECTOR  (N-1 DOWNTO 0);
+	SIGNAL  neg_b                        : STD_LOGIC_VECTOR  (N-1 DOWNTO 0);
+	SIGNAL  c_sel                        : STD_LOGIC_VECTOR  ( 1  DOWNTO 0);
+	SIGNAL  c_add, c_plus1, c_negB       : STD_LOGIC;
+	
+BEGIN
+-------------------------------------------------------------------------------------------------------------------
+-- ALU OPERATIONS
+-------------------------------------------------------------------------------------------------------------------
+	not_b    <= NOT datab;-- not_b=bus a negado
+	a_and_b  <= dataa AND datab;-- a_and_b= bus a AND bus b
+	a_or_b   <= dataa OR  datab;-- a_or_b= bus a OR bus b
+	a_xor_b  <= dataa XOR datab;-- a_xor_b= bus a XOR bus b
+
+	AplusB: ENTITY work.add_sub -- Llamado a la función add_sub
+	GENERIC MAP (M   =>    N) -- Ajuste de tamaño
+	PORT MAP ( -- Interconexión de señales
+		 a 			=>  dataa,
+		 b   			=>  datab,
+		 addn_sub   => '0',
+		 s          => a_plus_b,
+		 cout       => c_add);
+		 
+	Bplus1: ENTITY work.add_sub -- Llamado a la función add_sub
+	GENERIC MAP (M   =>    N) -- Ajuste de tamaño
+	PORT MAP ( -- Interconexión de señales
+		 a 			=>  datab,
+		 b   			=>  ONE,
+		 addn_sub   => '0',
+		 s          => b_plus_one,
+		 cout       => c_plus1);
+		 
+	negB: ENTITY work.add_sub -- Llamado a la función add_sub
+	GENERIC MAP (M   =>    N) -- Ajuste de tamaño
+	PORT MAP ( -- Interconexión de señales
+		 a 			=>  ZEROS,
+		 b   			=>  datab,
+		 addn_sub   => '1',
+		 s          => neg_b,
+		 cout       => c_negB);
+-------------------------------------------------------------------------------------------------------------------
+       --OUTPUT MULTIPLEXERS--
+-------------------------------------------------------------------------------------------------------------------
+-- RESULT MUX
+WITH selop SELECT 
+	result <= datab          WHEN  "000",--resultado=Bus a con un selop de 000
+				 not_b          WHEN  "001",--resultado=Bus b negado con un selop de 001	            
+			 	 a_and_b        WHEN  "010",--resultado=Bus a AND bus b con un selop de 010              
+				 a_or_b         WHEN  "011",--resultado=Bus a OR bus b con un selop de 011             
+				 a_xor_b        WHEN  "100",--resultado=Bus a XOR bus b con un selop de 100             
+				 a_plus_b       WHEN  "101",--resultado=bus a + bus b con un selop de 101            
+				 b_plus_one     WHEN  "110",--resultado= bus b +1 con un selop de 110        
+				 neg_b          WHEN  OTHERS;--resultado= bus b negado con un selop de 111     
+-- CARRY MUX
+		c_sel <= selop (1 DOWNTO 0);
+		WITH c_sel SELECT 
+		
+			cout  <=  c_add   WHEN "01",-- Cout=carry de bus a+bus b
+					  c_plus1   WHEN "10",-- Cout=carry de busb + 1
+					  c_negB    WHEN "11",-- Cout=carry de bus b
+					    '0'     WHEN OTHERS;
+END ARCHITECTURE;
